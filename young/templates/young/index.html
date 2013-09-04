@@ -1,0 +1,13 @@
+{% if object  %}
+{"count":20,"start":0,"total":{{ object.count }},"events":[
+{% for e in object %}
+{%if e.id = last.id%}
+{{e.printJSON}}
+{%else%}
+{{e.printJSON}},
+{%endif%}
+{% endfor %}
+]}
+{% else  %}
+nothing
+{% endif  %}

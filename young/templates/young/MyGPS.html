@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>    
+  <title>我的足迹</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.css" />
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery-1.4.3.min.js"></script>
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.js"></script>
+</head>
+<body>
+<div data-role="page">  
+  <div data-role="header">  
+    <h1>我的足迹</h1>  
+  </div><!-- /header -->  
+  <div data-role="content"> 
+{% if object  %}
+<ol>
+{% for e in object %}
+<li>{{e.id}}:{{ e.Location_X}},{{e.Location_Y}}<a data-role="button" data-icon="plus" href="http://api.map.baidu.com/marker?location={{ e.Location_X}},{{e.Location_Y}}&amp;coord_type=gcj02&amp;title=第{{ e.id }}次足迹&amp;content=记录&amp;output=html" >查看</a></li>
+{% endfor  %}
+</ol>
+{% else  %}
+还未留下足迹
+{% endif %}
+ </div><!-- /content -->  
+  <div data-role="footer">  
+    2013 young长安, all rights reserved  
+  </div><!-- /footer -->  
+</div><!-- /page -->  
+</body>  
+</html>

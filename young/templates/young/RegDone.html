@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>    
+  <title>{{ object.title }}</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.css" />
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery-1.4.3.min.js"></script>
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.js"></script>
+</head>
+<body>
+<div data-role="page">  
+  <div data-role="header">  
+    <h1>young长安-待审核预览</h1>  
+  </div><!-- /header -->  
+  <div data-role="content">    
+  <h1>{{ object.title  }}</h1>
+    <img width="275" src="{{ object.image_lmobile }}" title="活动海报" alt="{{ object.title  }}" />
+<a data-role="button" target="_blank" data-icon="plus"  href="http://page.renren.com/601740295" >去催主页君～</a>
+    <h2>活动时间:<h2>
+	<h3>{{ object.printTime  }}</h3>
+  
+<a data-role="button" data-icon="plus"  href="http://www.google.com/calendar/event?action=TEMPLATE&text={{object.title}}&dates={{object.printCalTime}}&details={{object.description}}&location={{object.adddress}}&trp=true&sprop=youngchangan" >添加至日历</a>
+    <h2>主办方:<h2>
+    {{ object.owner  }}
+
+    <h2>地点:</h2>
+    
+    <h3>{{object.adddress}}</h3>
+
+<a data-role="button" data-icon="plus" href="http://api.map.baidu.com/marker?location={{ object.GEO }}&amp;coord_type=wgs84&amp;title={{ object.printTitle }}&amp;content={{ object.printAdd }}&amp;output=html" >找路</a>
+  
+ 
+
+  <h2>类型:电影</h2>
+  
+  
+
+  <h2>活动介绍:</h2>
+{{ object.description  }}  	
+	
+	
+	
+  </div><!-- /content -->  
+  <div data-role="footer">  
+    2013 young长安, all rights reserved  
+  </div><!-- /footer -->  
+</div><!-- /page -->  
+</body>  
+</html>

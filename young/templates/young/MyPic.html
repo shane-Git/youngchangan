@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>    
+  <title>我的随拍</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.css" />
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery-1.4.3.min.js"></script>
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.js"></script>
+</head>
+<body>
+<div data-role="page">  
+  <div data-role="header">  
+<h1>我的随拍</h1>
+  </div><!-- /header -->  
+  <div data-role="content"> 
+{% if object  %}
+<ol>
+{% for e in object %}
+<li><a data-role="button" target="_blank" href="{{ e.Url  }}" >第{{e.id}}随拍</a></li>
+{% endfor  %}
+</ol>
+{% else  %}
+还未留下足迹
+{% endif %}
+ </div><!-- /content -->  
+  <div data-role="footer">  
+    2013 young长安, all rights reserved  
+  </div><!-- /footer -->  
+</div><!-- /page -->  
+</body>  
+</html>

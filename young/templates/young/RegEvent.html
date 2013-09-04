@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>    
+  <title>注册活动</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.css" />
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery-1.4.3.min.js"></script>
+  <script type="text/javascript" src="http://nanyang.xjtu.edu.cn/WeChat/lib/jquery.mobile-1.0a3.min.js"></script>
+</head>
+<body>
+<div data-role="page">  
+  <div data-role="header">  
+<h1>注册活动</h1>
+  </div><!-- /header -->  
+  <div data-role="content"> 
+{% if PicList  %}
+<form action="/young/Reg/"  method="POST">
+{% csrf_token %}
+<hidden name="user" value="{{user}}"></hidden>
+<input placeholder="活动名称" type="text" name="title" />
+<input placeholder="活动地点" type="text" name="address" />
+<input placeholder="举办方" type="text" name="owner" />
+<textarea name="description">活动描述</textarea>
+<h1>活动海报</h1>
+<select name="Pic">
+{% for e in PicList %}
+<option value="{{e.Url}}">{{e.id}}</option>
+{% endfor  %}
+</select>
+{% else  %}
+还未留下图片
+{% endif %}
+<h1>活动地理信息</h1>
+{% if GPSList  %}
+<select name="GPS">
+{% for e in GPSList %}
+<option value="{{ e.Location_X}},{{e.Location_Y}}">{{e.id}}</option>
+{% endfor  %}
+</select>
+{% else  %}
+还未留下足迹
+{% endif %}
+<h1>活动开始时间</h1>
+<input type="text" name="begin_time" placeholder="yyyy-mm-dd hh:MM:ss" value="">
+<h1>活动结束时间</h1>
+<input type="text" name="end_time"  placeholder="yyyy-mm-dd hh:MM:ss" value="">
+<input data-theme="b" type="submit" value="提交"/>
+</form>
+</div><!-- /content -->  
+  <div data-role="footer">  
+    2013 young长安, all rights reserved  
+  </div><!-- /footer -->  
+</div><!-- /page -->  
+</body>  
+</html>
