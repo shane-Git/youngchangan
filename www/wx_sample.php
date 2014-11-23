@@ -1,5 +1,5 @@
 <?php
-define("TOKEN", "shane");
+define("TOKEN", "EzMeal");
 
 $textTpl = 
 "<xml>
@@ -181,7 +181,6 @@ switch($postObj->MsgType)
       $resultStr .= sprintf($news_item, "输入“热门活动”可以查看这段时间内最热门的活动；","","http://nanyang.xjtu.edu.cn/WeChat/ico/star.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
       $resultStr .= sprintf($news_item, "支持分类别查看活动，可以输入“音乐”，“电影”，“运动”，“聚会”等；","","http://nanyang.xjtu.edu.cn/WeChat/ico/cat.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
       $resultStr .= sprintf($news_item, "如有疑问请点此查看更多>>","","http://nanyang.xjtu.edu.cn/WeChat/ico/more.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
-      $resultStr .= $news_footer;
       echo $resultStr;
       die;
     break;
@@ -195,7 +194,6 @@ switch($postObj->MsgType)
       $resultStr .= sprintf($news_item, "我的随拍","","http://nanyang.xjtu.edu.cn/WeChat/ico/photo.png" ,"http://nanyang.xjtu.edu.cn:8080/young/MyPic/".md5($fromUsername)."/");
       $resultStr .= sprintf($news_item, "注册活动","","http://nanyang.xjtu.edu.cn/WeChat/ico/flag.png" ,"http://nanyang.xjtu.edu.cn:8080/young/RegEvent/".md5($fromUsername)."/");
       $resultStr .= sprintf($news_item, "如有疑问请点此查看更多>>","","http://nanyang.xjtu.edu.cn/WeChat/ico/more.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
-      $resultStr .= $news_footer;
       echo $resultStr;
       die;
     break;
@@ -297,7 +295,6 @@ if(!$postObj->Content)
   $resultStr .= sprintf($news_item, "输入“热门活动”可以查看这段时间内最热门的活动；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/star.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
   $resultStr .= sprintf($news_item, "支持分类别查看活动，可以输入“音乐”，“电影”，“运动”，“聚会”等；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/cat.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
   $resultStr .= sprintf($news_item, "如有疑问请点此查看更多>>","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/more.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
-  $resultStr .= $news_footer;
   echo $resultStr;
   die;
 }

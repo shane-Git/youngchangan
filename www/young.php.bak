@@ -1,0 +1,394 @@
+<?php
+define("TOKEN", "shane");
+logger();
+$wechatObj = new wechatCallbackapiTest();
+//$wechatObj->valid();
+$wechatObj->responseMsg();
+
+class wechatCallbackapiTest
+{
+	public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+
+        //valid signature , option
+        if($this->checkSignature()){
+        	echo $echoStr;
+        	exit;
+        }
+    }
+
+    public function responseMsg()
+    {
+		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+		if (!empty($postStr)){
+                
+              	$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+                $fromUsername = $postObj->FromUserName;
+                $toUsername = $postObj->ToUserName;
+
+
+                $keyword = trim($postObj->Content);
+		file_put_contents("log.html",$keyword."#FROMUSER#".date('Y-m-d H:i:s ').$fromUsername."<br />",FILE_APPEND);
+                $time = time();
+                $textTpl = "<xml>
+							<ToUserName><![CDATA[%s]]></ToUserName>
+							<FromUserName><![CDATA[%s]]></FromUserName>
+							<CreateTime>%s</CreateTime>
+							<MsgType><![CDATA[%s]]></MsgType>
+							<Content><![CDATA[%s]]></Content>
+							<FuncFlag>0</FuncFlag>
+							</xml>";            
+$newsTpl = 
+"
+<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[%s]]></MsgType>
+<ArticleCount>1</ArticleCount>
+<Articles>
+<item>
+<Title><![CDATA[%s]]></Title>
+<Description><![CDATA[%s]]></Description>
+<PicUrl><![CDATA[%s]]></PicUrl>
+<Url><![CDATA[%s]]></Url>
+</item>
+</Articles>
+<FuncFlag>1</FuncFlag>
+</xml>
+";
+
+$news_header =
+"
+<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[%s]]></MsgType>
+<ArticleCount>%d</ArticleCount>
+<Articles>
+";
+$news_item =
+"
+<item>
+<Title><![CDATA[%s]]></Title>
+<Description><![CDATA[%s]]></Description>
+<PicUrl><![CDATA[%s]]></PicUrl>
+<Url><![CDATA[%s]]></Url>
+</item>
+";
+$news_footer =
+"
+</Articles>
+<FuncFlag>1</FuncFlag>
+</xml>
+";
+
+if($postObj->Content=="大学活动")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("http://nanyang.xjtu.edu.cn:8080/young/");
+			$contentStr = str_replace("&quot;",'"',$contentStr);
+                        $events_json = json_decode($contentStr);
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType,$events_json->total);
+                        for($i = 0;$i<$events_json->total;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,"对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="热门活动")
+{
+			$msgType = "news";
+			$contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=all");
+			$events_json = json_decode($contentStr);
+			$resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, 10);
+			for($i = 0;$i<10;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+			$resultStr .= $news_footer;
+			echo $resultStr;
+die;
+}
+
+if($postObj->Content=="音乐")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=music&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+			$count = $events_json->total;
+			if($count >10)
+			{
+				$count = 10;
+			}
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="戏剧")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=drama&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="展览")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=exhibition&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="讲座")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=salon&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="聚会")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=party&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="运动")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=sports&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="旅行")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=travel&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+if($postObj->Content=="公益")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=commonweal&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+ 
+if($postObj->Content=="电影")
+{
+                        $msgType = "news";
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=film&start=0&count=100");
+                        $events_json = json_decode($contentStr);
+                        $count = $events_json->total;
+                        if($count >10)
+                        {
+                                $count = 10;
+                        }
+                        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, $count);
+                        for($i = 0;$i<$count;$i++)
+{
+$resultStr .= sprintf($news_item, $events_json->events[$i]->title,$events_json->events[$i]->wisher_count."对此活动很感兴趣",$events_json->events[$i]->image_lmobile,$events_json->events[$i]->adapt_url);
+}
+                        $resultStr .= $news_footer;
+                        echo $resultStr;
+die;
+}
+
+if($postObj->Content=="帮助")
+{
+			$msgType = "news";
+#                        $resultStr = sprintf($newsTpl, $fromUsername, $toUsername, $time,$msgType,"欢迎关注“young长安”公共主页。","输入“热门活动”可以查看这段时间内最热的活动；输入“大学活动”查询已经注册的各个大学活动；输入1-100内的数字，可以详细查看自己喜欢的活动。","http://nanyang.xjtu.edu.cn/WeChat/banner.jpg","http://nanyang.xjtu.edu.cn/WeChat/note.html" );
+	$resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, 4);
+	$resultStr .= sprintf($news_item, "欢迎关注“young长安”公共主页","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/banner.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+        $resultStr .= sprintf($news_item, "输入“热门活动”可以查看这段时间内最热门的活动；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/star.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+        $resultStr .= sprintf($news_item, "支持分类别查看活动，可以输入“音乐”，“电影”，“运动”，“聚会”等；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/cat.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+	$resultStr .= sprintf($news_item, "如有疑问请点此查看更多>>","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/more.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+
+                        echo $resultStr;
+                        die;
+}
+
+if($postObj->Content=="手气不错")
+{
+                        $msgType = "news";
+                        $keepStr = $postObj->Content;
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=all&start=0&count=100");
+                        $test = json_decode($contentStr);
+                        $base = $test->total;
+                        if($test->total > 100)
+                        {
+                                $base = 100;
+                        }
+                        $randNum = rand()%$base;
+                        $resultStr = sprintf($newsTpl, $fromUsername, $toUsername, $time, $msgType,$test->events[$randNum]->title,$test->events[$randNum]->wisher_count."对此活动很感兴趣",$test->events[$randNum]->image_lmobile,$test->events[$randNum]->adapt_url);
+                        echo $resultStr;
+die;
+
+
+}
+
+		if($postObj->Content)
+                {
+                        file_put_contents("log.html",date('Y-m-d H:i:s ').$postObj->Content."<hr />",FILE_APPEND);
+                        $msgType = "news";
+                        $keepStr = $postObj->Content;
+                        $contentStr = file_get_contents("https://api.douban.com/v2/event/list?loc=118371&day_type=tomorrow&type=all&start=0&count=100");
+
+                        $test = json_decode($contentStr);
+                        if( (int)$keepStr > 0 && (int)$keepStr <= 99)
+                        {
+                        $resultStr = sprintf($newsTpl, $fromUsername, $toUsername, $time, $msgType,$test->events[$keyword-1]->title,$test->events[$keyword-1]->wisher_count."对此活动很感兴趣",$test->events[$keyword-1]->image_lmobile,$test->events[$keyword-1]->adapt_url);
+                        }
+                        else
+                        {
+                        $resultStr = sprintf($newsTpl, $fromUsername, $toUsername, $time,$msgType,"你输入的无效","请查看具体的帮助信息>>","http://nanyang.xjtu.edu.cn/WeChat/ico/error.jpg","http://nanyang.xjtu.edu.cn/WeChat/note.html");
+
+                        }
+                        echo $resultStr;
+                }
+		else
+		{
+			$msgType = "news";
+#			$resultStr = sprintf($newsTpl, $fromUsername, $toUsername, $time,$msgType,"欢迎关注“young长安”公共主页。","输入“热门活动”可以查看这段时间内最热的活动；输入“大学活动”查询已经注册的各个大学活动；输入1-100内的数字，可以详细查看自己喜欢的活动。","http://nanyang.xjtu.edu.cn/WeChat/banner.jpg","http://nanyang.xjtu.edu.cn/WeChat/note.html" );
+        $resultStr = sprintf($news_header, $fromUsername, $toUsername, $time, $msgType, 4);
+        $resultStr .= sprintf($news_item, "欢迎关注“young长安”公共主页","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/banner.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+        $resultStr .= sprintf($news_item, "输入“热门活动”可以查看这段时间内最热门的活动；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/star.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+        $resultStr .= sprintf($news_item, "支持分类别查看活动，可以输入“音乐”，“电影”，“运动”，“聚会”等；","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/cat.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+        $resultStr .= sprintf($news_item, "如有疑问请点此查看更多>>","对此活动很感兴趣","http://nanyang.xjtu.edu.cn/WeChat/ico/more.jpg" ,"http://nanyang.xjtu.edu.cn/WeChat/note.html");
+
+			echo $resultStr;
+                }
+
+        }else {
+        	echo "";
+        	exit;
+        }
+    }
+		
+	private function checkSignature()
+	{
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"];	
+        		
+		$token = TOKEN;
+		$tmpArr = array($token, $timestamp, $nonce);
+		sort($tmpArr);
+		$tmpStr = implode( $tmpArr );
+		$tmpStr = sha1( $tmpStr );
+		
+		if( $tmpStr == $signature ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+}
+
+function logger()
+{
+	file_put_contents("log.html",date('Y-m-d H:i:s ')."REMOTE_ADDR".$_SERVER["REMOTE_ADDR"]."<br />",FILE_APPEND);
+}
+
+?> 

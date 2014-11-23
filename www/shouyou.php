@@ -1,5 +1,5 @@
 <?php
-define("TOKEN", "shane");
+define("TOKEN", "812223035");
 
 $textTpl = 
 "<xml>
