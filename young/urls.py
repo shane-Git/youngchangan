@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url
 
 from young import views
+from mysite import path
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
