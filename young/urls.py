@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^RegEvent/(?P<user>\w+)/$',views.RegEvent),
     url(r'^Reg/$',views.Reg),
     url(r'^Session/(?P<user>\w+)/(?P<movement>.+)/$',views.GetSession),
-    url(r'^RES/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.RES_PATH}),
+    url(r'^RES/(?P<path>.*)$','django.views.static.serve',{'document_root':path.RES_PATH}),
     # ex: /polls/5/vote/
 #    url(r'^(?P<poll_id>\d+)/vote/$', views.vote, name='vote'),
 
